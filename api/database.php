@@ -5,7 +5,7 @@
 
 	define('DB_HOST', 'localhost');
 	define('DB_USER', 'root');
-	define('DB_PASS', 'root');
+	define('DB_PASS', 'root1');
 	define('DB_NAME', 'mydb');
 
 	function connect() {
@@ -22,4 +22,5 @@
 
 	$con = connect();
 	// php -S 127.0.0.1:8080 -t ./backend
+	// php -S 127.0.0.1:8080 -t ./
 ?>
