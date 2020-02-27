@@ -5,7 +5,7 @@
 
 	define('DB_HOST', 'localhost');
 	define('DB_USER', 'root');
-	define('DB_PASS', 'root1');
+	define('DB_PASS', 'root');
 	define('DB_NAME', 'mydb');
 
 	function connect() {
