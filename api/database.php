@@ -7,7 +7,7 @@
 	define('DB_USER', 'root');
 	define('DB_PASS', 'root1');
 	define('DB_NAME', 'mydb');
-//test
+//test adsfas d f
 	function connect() {
 	  $connect = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
