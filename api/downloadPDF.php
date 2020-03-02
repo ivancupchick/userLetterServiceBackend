@@ -1,87 +1,261 @@
 <?php
-
-//$r_ko_n = mysqli_real_escape_string($con, trim($request->receiverAddress->komu->name));
-//$r_ko_s = mysqli_real_escape_string($con, trim($request->receiverAddress->komu->surname));
-//$r_ko_o = mysqli_real_escape_string($con, trim($request->receiverAddress->komu->otchestvo));
-
-$r_ko_n = "Имя";
-$r_ko_s = "Фамилия";
-$r_ko_o = "Отчество";
-//
-//$r_ku_st = mysqli_real_escape_string($con, trim($request->receiverAddress->kuda->streetType));
-////обрабатывать тип улицы (передаётся enum)
-//$r_ku_sn = mysqli_real_escape_string($con, trim($request->receiverAddress->kuda->streetName));
-//$r_ku_noh = mysqli_real_escape_string($con, trim($request->receiverAddress->kuda->numberOfHouse));
-//$r_ku_nok = mysqli_real_escape_string($con, trim($request->receiverAddress->kuda->numberOfKorpus));
-//$r_ku_nof = mysqli_real_escape_string($con, trim($request->receiverAddress->kuda->numberOfFlat));
-//
-//$r_index = mysqli_real_escape_string($con, trim($request->receiverAddress->index));
-//
-//$r_npn_o = mysqli_real_escape_string($con, trim($request->receiverAddress->nasPunktName->oblast));
-//$r_npn_r = mysqli_real_escape_string($con, trim($request->receiverAddress->nasPunktName->region));
-//$r_npn_tn = mysqli_real_escape_string($con, trim($request->receiverAddress->nasPunktName->townName));
-//$r_npn_tot = mysqli_real_escape_string($con, trim($request->receiverAddress->nasPunktName->typeOfTown));
-//
-//$o_ok_n = mysqli_real_escape_string($con, trim($request->otpravitelAddress->otKogo->name));
-//$o_ok_s = mysqli_real_escape_string($con, trim($request->otpravitelAddress->otKogo->surname));
-//$o_ok_o = mysqli_real_escape_string($con, trim($request->otpravitelAddress->otKogo->otchestvo));
-//
-//$o_a_o = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->oblast));
-//$o_a_r = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->region));
-//$o_a_tn = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->townName));
-//$o_a_tot = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->typeOfTown));
-//
-//$o_a_st = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->streetType));
-//$o_a_sn = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->streetName));
-//$o_a_noh = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->numberOfHouse));
-//$o_a_nok = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->numberOfKorpus));
-//$o_a_nof = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->numberOfFlat));
-//
-//$dateAndTimeOfStartWay = mysqli_real_escape_string($con, (int)$request->dateAndTimeOfStartWay);
-// подключаем шрифты
-//define('FPDF_FONTPATH',"fpdf/font/");
-// подключаем библиотеку
-//require('fpdf/fpdf.php');
+require 'database.php';
 require_once( "../fpdf/fpdf.php" );
-// создаем PDF документ
 
-$pdf = new FPDF( 'L', 'mm', 'A4' );
+$letter = [];
+$sql = "SELECT * FROM letters WHERE `id` = '1' LIMIT 1";
 
-$pdf->AddPage();
+//$sql = "SELECT * FROM letters WHERE `id` = '{$id}' LIMIT 1";
+//временно указал id равным 1 для теста, позже его придётся передавать
+//$sql = "SELECT id, number, amount FROM policies";
+
+
+if($result = mysqli_query($con,$sql))
+{
+    $i = 0;
+    while($row = mysqli_fetch_assoc($result))
+    {
+//        $letter['hash'] = $row['hash'];
+//        $letter['status'] = $row['status'];
+
+//        $letter['isMejdunarond'] = $row['isMejdunarond'];
+
+        //нижний правый угол
+        $letter['receiverAddress']['komu']['name'] = $row['r_ko_n'];
+        $letter['receiverAddress']['komu']['surname'] = $row['r_ko_s'];
+        $letter['receiverAddress']['komu']['otchestvo'] = $row['r_ko_o'];
+
+
+        $letter['receiverAddress']['kuda']['streetType'] = $row['r_ku_st'];
+        //нужно сделать обработку вида улицы или изменить данные в БД
+        $letter['receiverAddress']['kuda']['streetName'] = $row['r_ku_sn'];
+        $letter['receiverAddress']['kuda']['numberOfHouse'] = $row['r_ku_noh'];
+        $letter['receiverAddress']['kuda']['numberOfKorpus'] = $row['r_ku_nok'];
+        $letter['receiverAddress']['kuda']['numberOfFlat'] = $row['r_ku_nof'];
+
+        $letter['receiverAddress']['index'] = $row['r_index'];
+
+        $letter['receiverAddress']['nasPunktName']['oblast'] = $row['r_npn_o'];
+        $letter['receiverAddress']['nasPunktName']['region'] = $row['r_npn_r'];
+        $letter['receiverAddress']['nasPunktName']['townName'] = $row['r_npn_tn'];
+        $letter['receiverAddress']['nasPunktName']['typeOfTown'] = $row['r_npn_tot'];
+
+
+        //вержний левый угол
+        $letter['otpravitelAddress']['otKogo']['name'] = $row['o_ok_n'];
+        $letter['otpravitelAddress']['otKogo']['surname'] = $row['o_ok_s'];
+        $letter['otpravitelAddress']['otKogo']['otchestvo'] = $row['o_ok_o'];
+
+        $letter['otpravitelAddress']['adress']['oblast'] = $row['o_a_o'];
+        $letter['otpravitelAddress']['adress']['region'] = $row['o_a_r'];
+        $letter['otpravitelAddress']['adress']['townName'] = $row['o_a_tn'];
+        $letter['otpravitelAddress']['adress']['typeOfTown'] = $row['o_a_tot'];
+
+        $letter['otpravitelAddress']['adress']['streetType'] = $row['o_a_st'];
+        $letter['otpravitelAddress']['adress']['streetName'] = $row['o_a_sn'];
+        $letter['otpravitelAddress']['adress']['numberOfHouse'] = $row['o_a_noh'];
+        $letter['otpravitelAddress']['adress']['numberOfKorpus'] = $row['o_a_nok'];
+        $letter['otpravitelAddress']['adress']['numberOfFlat'] = $row['o_a_nof'];
+//
+//        $letter['dateAndTimeOfStartWay'] = $row['dateAndTimeOfStartWay'];
+
+        $i++;
+    }
+
+    // начало PDF
+
+    $pdf = new FPDF( 'L', 'mm', 'A4' );
+
+    $pdf->AddPage();
 
 //$pdf=new FPDF();
 //// устанавливаем заголовок документа
-$pdf->SetTitle("Скачать PDF письма", true);
+    $pdf->SetTitle("Скачать PDF письма", true);
 
 //// создаем страницу
 //$pdf->AddPage('L');
 //$pdf->SetDisplayMode(real,'default');
 
 // добавляем шрифт ариал
-$pdf->AddFont('Arial','','arial.php');
+    $pdf->AddFont('Arial','','arial.php');
 // устанавливаем шрифт Ариал
-$pdf->SetFont('Arial');
+    $pdf->SetFont('Arial');
 // устанавливаем цвет шрифта
 //$pdf->SetTextColor(250,60,100);
 // устанавливаем размер шрифта
-$pdf->SetFontSize(6);
+    $pdf->SetFontSize(12);
 
 // добавляем текст
-$pdf->SetXY(140,75);
-$pdf->Write(0,iconv('utf-8', 'windows-1251', $r_ko_n));
 
-$pdf->SetXY(140,82);
-$pdf->Write(0,iconv('utf-8', 'windows-1251',$r_ko_s));
+    //1
+    $pdf->SetXY(140,77);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['komu']['surname'] ));
 
-$pdf->SetXY(175,82);
-$pdf->Write(0,iconv('utf-8', 'windows-1251',$r_ko_o));
+    //2
+    $pdf->SetXY(140,84);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['komu']['name']));
+
+    $pdf->SetXY(175,84);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['komu']['otchestvo']));
+
+    //3
+    $pdf->SetXY(140,91);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['nasPunktName']['oblast']));
+
+    $pdf->SetXY(205,91);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',  "обл."));
+
+    //4
+    $pdf->SetXY(140,98);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['nasPunktName']['region']));
+
+    $pdf->SetXY(205,98);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',  "р-н"));
+
+    //5 индекс
+    $pdf->SetXY(140,105);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['index']));
+
+    $pdf->SetXY(171,105);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['nasPunktName']['typeOfTown']));
+
+    $pdf->SetXY(180,105);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['nasPunktName']['townName']));
+
+    //6
+    $pdf->SetXY(140,112);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',$letter['receiverAddress']['kuda']['streetType']));
+
+    $pdf->SetXY(150,112);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['kuda']['streetName']));
+
+    $pdf->SetXY(185,112);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['kuda']['numberOfHouse']));
+
+    $pdf->SetXY(295,112);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['kuda']['numberOfKorpus']));
+
+    $pdf->SetXY(205,112);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['kuda']['numberOfFlat']));
+
+
+//    $pdf->Ln(4);                    //Break
+    $pdf->Line(10, 10, 230, 10);  //Set the line
+    $pdf->Line(230, 10, 230, 120);  //Set the line
+    $pdf->Line(230, 120, 10, 120);  //Set the line
+    $pdf->Line(10, 120, 10, 10);  //Set the line
+
+
+//    $pdf->Ln(4);
+    //вехний левый угол
+
+
+    //вержний левый угол
+
+    //1
+    $pdf->SetXY( 20, 22);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['otKogo']['surname']));
+
+    //2
+    $pdf->SetXY( 20, 29);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['otKogo']['name']));
+
+    $pdf->SetXY( 55, 29);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['otKogo']['otchestvo']));
+
+    //3
+    $pdf->SetXY( 20, 36);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['adress']['oblast']));
+
+    $pdf->SetXY( 80, 36);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',  "обл."));
+
+    //4
+    $pdf->SetXY( 20, 43);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['adress']['region']));
+
+    $pdf->SetXY( 45, 43);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['typeOfTown']));
+
+    $pdf->SetXY( 55, 43);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['townName']));
+
+    //5
+    $pdf->SetXY( 20, 50);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['streetType']));
+
+    $pdf->SetXY( 30, 50);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['streetName']));
+
+    $pdf->SetXY( 65, 50);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['numberOfHouse']));
+
+    $pdf->SetXY( 75, 50);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',   $letter['otpravitelAddress']['adress']['numberOfKorpus']));
+
+    $pdf->SetXY( 85, 50);
+    $pdf->Write(0,iconv('utf-8', 'windows-1251',   $letter['otpravitelAddress']['adress']['numberOfFlat']));
+
+//индекс отправителя забыли в бд
 
 
 
 
-// выводим документа в браузере
-$pdf->Output('letter.pdf','I');
+    // конец PDF
 
+
+    $pdf->Output('letter.pdf','I');
+}
+else
+{
+    http_response_code(404);
+}
+
+//$dateAndTimeOfStartWay = mysqli_real_escape_string($con, (int)$request->dateAndTimeOfStartWay);
+// подключаем шрифты
+//define('FPDF_FONTPATH',"fpdf/font/");
+// подключаем библиотеку
+//require('fpdf/fpdf.php');
+//require_once( "../fpdf/fpdf.php" );
+//// создаем PDF документ
+//
+//$pdf = new FPDF( 'L', 'mm', 'A4' );
+//
+//$pdf->AddPage();
+//
+////$pdf=new FPDF();
+////// устанавливаем заголовок документа
+//$pdf->SetTitle("Скачать PDF письма", true);
+//
+////// создаем страницу
+////$pdf->AddPage('L');
+////$pdf->SetDisplayMode(real,'default');
+//
+//// добавляем шрифт ариал
+//$pdf->AddFont('Arial','','arial.php');
+//// устанавливаем шрифт Ариал
+//$pdf->SetFont('Arial');
+//// устанавливаем цвет шрифта
+////$pdf->SetTextColor(250,60,100);
+//// устанавливаем размер шрифта
+//$pdf->SetFontSize(6);
+//
+//// добавляем текст
+//$pdf->SetXY(140,75);
+//$pdf->Write(0,iconv('utf-8', 'windows-1251', $r_ko_n));
+//
+//$pdf->SetXY(140,82);
+//$pdf->Write(0,iconv('utf-8', 'windows-1251',$r_ko_s));
+//
+//$pdf->SetXY(175,82);
+//$pdf->Write(0,iconv('utf-8', 'windows-1251',$r_ko_o));
+//
+//
+//
+//
+//// выводим документа в браузере
+//$pdf->Output('letter.pdf','I');
+//
 
 
 //require_once( "../fpdf/fpdf.php" );
