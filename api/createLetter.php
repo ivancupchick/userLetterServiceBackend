@@ -13,7 +13,6 @@ if(isset($postdata) && !empty($postdata))
   // Validate.
   if(
     trim($request->hash) === '' ||
-    (int)$request->status < -1 ||
     trim($request->receiverAddress->komu->name) === '' ||
     trim($request->receiverAddress->komu->surname) === '' ||
     trim($request->receiverAddress->komu->otchestvo) === '' // ||
@@ -105,12 +104,10 @@ primary key(id))
   if(mysqli_query($con,$sql))
   {
     http_response_code(201);
-    $policy = [
-      'number' => $number,
-      'amount' => $amount,
-      'id'    => mysqli_insert_id($con)
+    $letter = [
+      'id' => mysqli_insert_id($con)
     ];
-    echo json_encode($policy);
+    echo json_encode($letter);
   }
   else
   {
