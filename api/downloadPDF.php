@@ -9,6 +9,11 @@ $sql = "SELECT * FROM letters WHERE `id` = '1' LIMIT 1";
 //временно указал id равным 1 для теста, позже его придётся передавать
 //$sql = "SELECT id, number, amount FROM policies";
 
+function writeOnPdf(FPDF $pdf, string $text, int $x, int $y) {
+    $pdf->SetXY($x, $y);
+    $pdf->Write(0, iconv('utf-8', 'windows-1251', $text));
+}
+
 
 if($result = mysqli_query($con,$sql))
 {
@@ -24,6 +29,7 @@ if($result = mysqli_query($con,$sql))
         $letter['receiverAddress']['komu']['name'] = $row['r_ko_n'];
         $letter['receiverAddress']['komu']['surname'] = $row['r_ko_s'];
         $letter['receiverAddress']['komu']['otchestvo'] = $row['r_ko_o'];
+
 
 
         $letter['receiverAddress']['kuda']['streetType'] = $row['r_ku_st'];
@@ -88,55 +94,40 @@ if($result = mysqli_query($con,$sql))
 // добавляем текст
 
     //1
-    $pdf->SetXY(140,77);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['komu']['surname'] ));
+    writeOnPdf($pdf, $letter['receiverAddress']['komu']['surname'], 140, 77);
 
     //2
-    $pdf->SetXY(140,84);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['komu']['name']));
+    writeOnPdf($pdf, $letter['receiverAddress']['komu']['name'], 140, 84);
 
-    $pdf->SetXY(175,84);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['komu']['otchestvo']));
+    writeOnPdf($pdf, $letter['receiverAddress']['komu']['otchestvo'], 175, 84);
 
     //3
-    $pdf->SetXY(140,91);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['nasPunktName']['oblast']));
+    writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['oblast'], 140, 91);
 
-    $pdf->SetXY(205,91);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',  "обл."));
+    writeOnPdf($pdf,  "обл.", 205, 91);
 
     //4
-    $pdf->SetXY(140,98);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['nasPunktName']['region']));
+    writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['region'], 140, 98);
 
-    $pdf->SetXY(205,98);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',  "р-н"));
+    writeOnPdf($pdf,  "р-н", 205, 98);
 
     //5 индекс
-    $pdf->SetXY(140,105);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['index']));
+    writeOnPdf($pdf, $letter['receiverAddress']['index'], 140, 105);
 
-    $pdf->SetXY(171,105);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['nasPunktName']['typeOfTown']));
+    writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['typeOfTown'], 171, 105);
 
-    $pdf->SetXY(180,105);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['nasPunktName']['townName']));
+    writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['townName'], 180, 105);
 
     //6
-    $pdf->SetXY(140,112);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',$letter['receiverAddress']['kuda']['streetType']));
+    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['streetType'], 140, 112);
 
-    $pdf->SetXY(150,112);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['kuda']['streetName']));
+    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['streetName'], 150, 112);
 
-    $pdf->SetXY(185,112);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['kuda']['numberOfHouse']));
+    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfHouse'], 185, 112);
 
-    $pdf->SetXY(295,112);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['kuda']['numberOfKorpus']));
+    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfKorpus'], 295, 112);
 
-    $pdf->SetXY(205,112);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['receiverAddress']['kuda']['numberOfFlat']));
+    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfFlat'], 205,112);
 
 
 //    $pdf->Ln(4);                    //Break
@@ -153,52 +144,40 @@ if($result = mysqli_query($con,$sql))
     //вержний левый угол
 
     //1
-    $pdf->SetXY( 20, 22);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['otKogo']['surname']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['surname'], 20, 22);
 
     //2
-    $pdf->SetXY( 20, 29);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['otKogo']['name']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['name'], 20, 29);
 
-    $pdf->SetXY( 55, 29);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['otKogo']['otchestvo']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['otchestvo'], 55, 29);
 
     //3
-    $pdf->SetXY( 20, 36);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['adress']['oblast']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['oblast'], 20, 36);
 
-    $pdf->SetXY( 80, 36);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',  "обл."));
+    writeOnPdf($pdf,  "обл.", 80, 36);
 
     //4
-    $pdf->SetXY( 20, 43);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251', $letter['otpravitelAddress']['adress']['region']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['region'], 20, 43);
 
-    $pdf->SetXY( 45, 43);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['typeOfTown']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['typeOfTown'], 45, 43);
 
-    $pdf->SetXY( 55, 43);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['townName']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['townName'], 55, 43);
 
     //5
-    $pdf->SetXY( 20, 50);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['streetType']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['streetType'], 20, 50);
 
-    $pdf->SetXY( 30, 50);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['streetName']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['streetName'], 30, 50);
 
-    $pdf->SetXY( 65, 50);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',  $letter['otpravitelAddress']['adress']['numberOfHouse']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfHouse'], 65, 50);
 
-    $pdf->SetXY( 75, 50);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',   $letter['otpravitelAddress']['adress']['numberOfKorpus']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfKorpus'], 75, 50);
 
-    $pdf->SetXY( 85, 50);
-    $pdf->Write(0,iconv('utf-8', 'windows-1251',   $letter['otpravitelAddress']['adress']['numberOfFlat']));
+    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfFlat'], 85, 50);
 
 //индекс отправителя забыли в бд
 
-
+    $value = "1";
+    $pdf->Image('http://chart.apis.google.com/chart?cht=qr&chs=350x350&chl='.$value.'.png', 47 ,65 ,45);
 
 
     // конец PDF
@@ -242,7 +221,7 @@ else
 //
 //// добавляем текст
 //$pdf->SetXY(140,75);
-//$pdf->Write(0,iconv('utf-8', 'windows-1251', $r_ko_n));
+//writeOnPdf($pdf, $r_ko_n));
 //
 //$pdf->SetXY(140,82);
 //$pdf->Write(0,iconv('utf-8', 'windows-1251',$r_ko_s));
@@ -350,6 +329,3 @@ else
 //$pdf->Output( "report.pdf", "I" );
 
 ?>
-
-
-
