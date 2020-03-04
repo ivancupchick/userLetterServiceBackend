@@ -3,7 +3,14 @@ require 'database.php';
 require_once( "../fpdf/fpdf.php" );
 
 $letter = [];
-$sql = "SELECT * FROM letters WHERE `id` = '1' LIMIT 1";
+
+$id = ($_GET['id'] !== null && (int)$_GET['id'] > -1)? mysqli_real_escape_string($con, (int)$_GET['id']) : false;
+
+if($id === false) {
+  return http_response_code(400);
+}
+
+$sql = "SELECT * FROM letters WHERE `id` = $id LIMIT 1";
 
 //$sql = "SELECT * FROM letters WHERE `id` = '{$id}' LIMIT 1";
 //временно указал id равным 1 для теста, позже его придётся передавать

@@ -104,9 +104,11 @@ primary key(id))
   if(mysqli_query($con,$sql))
   {
     http_response_code(201);
-    $letter = [
-      'id' => mysqli_insert_id($con)
-    ];
+
+    $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    $id = mysqli_insert_id($con);
+
+    $letter = $actual_link . "/../downloadPDF.php?id=" . $id;
     echo json_encode($letter);
   }
   else
