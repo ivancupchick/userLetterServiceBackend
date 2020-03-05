@@ -24,35 +24,43 @@ if (isset($postdata) && !empty($postdata)) {
     $hash = mysqli_real_escape_string($con, trim($request->hash));
     $status = mysqli_real_escape_string($con, trim($request->status));
     $isMejdunarond = mysqli_real_escape_string($con, trim($request->isMejdunarond));
+
     $r_ko_n = mysqli_real_escape_string($con, trim($request->receiverAddress->komu->name));
     $r_ko_s = mysqli_real_escape_string($con, trim($request->receiverAddress->komu->surname));
     $r_ko_o = mysqli_real_escape_string($con, trim($request->receiverAddress->komu->otchestvo));
+
     $r_a_st = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->streetType));
     $r_a_sn = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->streetName));
     $r_a_noh = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->numberOfHouse));
     $r_a_nok = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->numberOfKorpus));
     $r_a_nof = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->numberOfFlat));
+
     $r_a_o = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->oblast));
     $r_a_r = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->region));
     $r_a_tn = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->townName));
     $r_a_tot = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->typeOfTown));
     $r_a_c = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->country));
+
     $r_a_index = mysqli_real_escape_string($con, trim($request->receiverAddress->adress->index));
+
     $o_ok_n = mysqli_real_escape_string($con, trim($request->otpravitelAddress->otKogo->name));
     $o_ok_s = mysqli_real_escape_string($con, trim($request->otpravitelAddress->otKogo->surname));
     $o_ok_o = mysqli_real_escape_string($con, trim($request->otpravitelAddress->otKogo->otchestvo));
+
     $o_a_o = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->oblast));
     $o_a_r = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->region));
     $o_a_tn = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->townName));
     $o_a_tot = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->typeOfTown));
+
     $o_a_c = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->country));
     $o_a_index = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->index));
+
     $o_a_st = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->streetType));
     $o_a_sn = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->streetName));
     $o_a_noh = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->numberOfHouse));
     $o_a_nok = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->numberOfKorpus));
     $o_a_nof = mysqli_real_escape_string($con, trim($request->otpravitelAddress->adress->numberOfFlat));
-    $tof = mysqli_real_escape_string($con, trim($request->typeOfLetter));
+
     $lt = mysqli_real_escape_string($con, trim($request->letterType));
     $sm = mysqli_real_escape_string($con, trim($request->specMarks));
     $lwav = mysqli_real_escape_string($con, trim($request->letterWithAnnouncedValue));
@@ -61,9 +69,9 @@ if (isset($postdata) && !empty($postdata)) {
 
     // Create.
     $sql = "INSERT INTO `letters`(`id`,
-    `hash`,`status`,`isMejdunarond`,`r_ko_n`,`r_ko_s`,`r_ko_o`,`r_a_st`,`r_a_sn`,`r_a_noh`,`r_a_nok`,`r_a_nof`,`r_a_o`,`r_a_r`,`r_a_tn`,`r_a_tot`,`r_a_c`,`r_a_index`,`o_ok_n`,`o_ok_s`,`o_ok_o`,`o_a_o`,`o_a_r`,`o_a_tn`,`o_a_tot`,`o_a_c`,`o_a_index`,`o_a_st`,`o_a_sn`,`o_a_noh`,`o_a_nok`,`o_a_nof`,`tof`,`lt`,`sm`,`lwav`,`lwp`,`dateAndTimeOfStartWay`
+    `hash`,`status`,`isMejdunarond`,`r_ko_n`,`r_ko_s`,`r_ko_o`,`r_a_st`,`r_a_sn`,`r_a_noh`,`r_a_nok`,`r_a_nof`,`r_a_o`,`r_a_r`,`r_a_tn`,`r_a_tot`,`r_a_c`,`r_a_index`,`o_ok_n`,`o_ok_s`,`o_ok_o`,`o_a_o`,`o_a_r`,`o_a_tn`,`o_a_tot`,`o_a_c`,`o_a_index`,`o_a_st`,`o_a_sn`,`o_a_noh`,`o_a_nok`,`o_a_nof`,`lt`,`sm`,`lwav`,`lwp`,`dateAndTimeOfStartWay`
     ) VALUES (null,
-    '{$hash}','{$status}','{$isMejdunarond}','{$r_ko_n}','{$r_ko_s}','{$r_ko_o}','{$r_a_st}','{$r_a_sn}','{$r_a_noh}','{$r_a_nok}','{$r_a_nof}','{$r_a_o}','{$r_a_r}','{$r_a_tn}','{$r_a_tot}','{$r_a_c}','{$r_a_index}','{$o_ok_n}','{$o_ok_s}','{$o_ok_o}','{$o_a_o}','{$o_a_r}','{$o_a_tn}','{$o_a_tot}','{$o_a_c}','{$o_a_index}','{$o_a_st}','{$o_a_sn}','{$o_a_noh}','{$o_a_nok}','{$o_a_nof}','{$tof}','{$lt}','{$sm}','{$lwav}','{$lwp}','{$dateAndTimeOfStartWay}'
+    '{$hash}','{$status}','{$isMejdunarond}','{$r_ko_n}','{$r_ko_s}','{$r_ko_o}','{$r_a_st}','{$r_a_sn}','{$r_a_noh}','{$r_a_nok}','{$r_a_nof}','{$r_a_o}','{$r_a_r}','{$r_a_tn}','{$r_a_tot}','{$r_a_c}','{$r_a_index}','{$o_ok_n}','{$o_ok_s}','{$o_ok_o}','{$o_a_o}','{$o_a_r}','{$o_a_tn}','{$o_a_tot}','{$o_a_c}','{$o_a_index}','{$o_a_st}','{$o_a_sn}','{$o_a_noh}','{$o_a_nok}','{$o_a_nof}','{$lt}','{$sm}','{$lwav}','{$lwp}','{$dateAndTimeOfStartWay}'
     )";
 
     /*
@@ -100,7 +108,6 @@ if (isset($postdata) && !empty($postdata)) {
     o_a_noh varchar(200),
     o_a_nok varchar(200),
     o_a_nof varchar(200),
-    tof varchar(200),
     lt varchar(200),
     sm varchar(200),
     lwav varchar(200),
