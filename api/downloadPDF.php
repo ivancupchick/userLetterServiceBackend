@@ -1,13 +1,13 @@
 <?php
 require 'database.php';
-require_once( "../fpdf/fpdf.php" );
+require_once("../fpdf/fpdf.php");
 
 $letter = [];
 
-$id = ($_GET['id'] !== null && (int)$_GET['id'] > -1)? mysqli_real_escape_string($con, (int)$_GET['id']) : false;
+$id = ($_GET['id'] !== null && (int)$_GET['id'] > -1) ? mysqli_real_escape_string($con, (int)$_GET['id']) : false;
 
-if($id === false) {
-  return http_response_code(400);
+if ($id === false) {
+    return http_response_code(400);
 }
 
 $sql = "SELECT * FROM letters WHERE `id` = $id LIMIT 1";
@@ -16,17 +16,16 @@ $sql = "SELECT * FROM letters WHERE `id` = $id LIMIT 1";
 //временно указал id равным 1 для теста, позже его придётся передавать
 //$sql = "SELECT id, number, amount FROM policies";
 
-function writeOnPdf(FPDF $pdf, string $text, int $x, int $y) {
+function writeOnPdf(FPDF $pdf, string $text, int $x, int $y)
+{
     $pdf->SetXY($x, $y);
     $pdf->Write(0, iconv('utf-8', 'windows-1251', $text));
 }
 
 
-if($result = mysqli_query($con,$sql))
-{
+if ($result = mysqli_query($con, $sql)) {
     $i = 0;
-    while($row = mysqli_fetch_assoc($result))
-    {
+    while ($row = mysqli_fetch_assoc($result)) {
 //        $letter['hash'] = $row['hash'];
 //        $letter['status'] = $row['status'];
 
@@ -36,7 +35,6 @@ if($result = mysqli_query($con,$sql))
         $letter['receiverAddress']['komu']['name'] = $row['r_ko_n'];
         $letter['receiverAddress']['komu']['surname'] = $row['r_ko_s'];
         $letter['receiverAddress']['komu']['otchestvo'] = $row['r_ko_o'];
-
 
 
         $letter['receiverAddress']['kuda']['streetType'] = $row['r_ku_st'];
@@ -77,7 +75,7 @@ if($result = mysqli_query($con,$sql))
 
     // начало PDF
 
-    $pdf = new FPDF( 'L', 'mm', 'A4' );
+    $pdf = new FPDF('L', 'mm', 'A4');
 
     $pdf->AddPage();
 
@@ -90,7 +88,7 @@ if($result = mysqli_query($con,$sql))
 //$pdf->SetDisplayMode(real,'default');
 
 // добавляем шрифт ариал
-    $pdf->AddFont('Arial','','arial.php');
+    $pdf->AddFont('Arial', '', 'arial.php');
 // устанавливаем шрифт Ариал
     $pdf->SetFont('Arial');
 // устанавливаем цвет шрифта
@@ -111,12 +109,12 @@ if($result = mysqli_query($con,$sql))
     //3
     writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['oblast'], 140, 91);
 
-    writeOnPdf($pdf,  "обл.", 205, 91);
+    writeOnPdf($pdf, "обл.", 205, 91);
 
     //4
     writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['region'], 140, 98);
 
-    writeOnPdf($pdf,  "р-н", 205, 98);
+    writeOnPdf($pdf, "р-н", 205, 98);
 
     //5 индекс
     writeOnPdf($pdf, $letter['receiverAddress']['index'], 140, 105);
@@ -134,18 +132,34 @@ if($result = mysqli_query($con,$sql))
 
     writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfKorpus'], 295, 112);
 
-    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfFlat'], 205,112);
+    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfFlat'], 205, 112);
 
 
 //    $pdf->Ln(4);                    //Break
+
+    //рамка
     $pdf->Line(10, 10, 230, 10);  //Set the line
     $pdf->Line(230, 10, 230, 120);  //Set the line
     $pdf->Line(230, 120, 10, 120);  //Set the line
     $pdf->Line(10, 120, 10, 10);  //Set the line
 
+    //верхий левый угол - линии
+    $pdf->Line(20, 22 + 2, 90, 22 + 2);
+    $pdf->Line(20, 29 + 2, 90, 29 + 2);
+    $pdf->Line(20, 36 + 2, 90, 36 + 2);
+    $pdf->Line(20, 43 + 2, 90, 43 + 2);
+    $pdf->Line(20, 50 + 2, 90, 50 + 2);
 
-//    $pdf->Ln(4);
-    //вехний левый угол
+    //правый нижний угол - линии
+
+    $pdf->Line(140, 77 + 2, 220, 77 + 2);
+    $pdf->Line(140, 84 + 2, 220, 84 + 2);
+    $pdf->Line(140, 91 + 2, 220, 91 + 2);
+    $pdf->Line(140, 98 + 2, 220, 98 + 2);
+    $pdf->Line(140, 105 + 2, 220, 105 + 2);
+    $pdf->Line(140, 112 + 2, 220, 112 + 2);
+
+
 
 
     //вержний левый угол
@@ -161,7 +175,7 @@ if($result = mysqli_query($con,$sql))
     //3
     writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['oblast'], 20, 36);
 
-    writeOnPdf($pdf,  "обл.", 80, 36);
+    writeOnPdf($pdf, "обл.", 80, 36);
 
     //4
     writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['region'], 20, 43);
@@ -184,16 +198,14 @@ if($result = mysqli_query($con,$sql))
 //индекс отправителя забыли в бд
 
     $value = "1";
-    $pdf->Image('http://chart.apis.google.com/chart?cht=qr&chs=350x350&chl='.$value.'.png', 47 ,65 ,45);
+    $pdf->Image('http://chart.apis.google.com/chart?cht=qr&chs=350x350&chl=' . $value . '.png', 47, 65, 45);
 
 
     // конец PDF
 
 
-    $pdf->Output('letter.pdf','I');
-}
-else
-{
+    $pdf->Output('letter.pdf', 'I');
+} else {
     http_response_code(404);
 }
 
