@@ -16,62 +16,73 @@ $sql = "SELECT * FROM letters WHERE `id` = $id LIMIT 1";
 //временно указал id равным 1 для теста, позже его придётся передавать
 //$sql = "SELECT id, number, amount FROM policies";
 
-function writeOnPdf(FPDF $pdf, string $text, int $x, int $y)
-{
+function writeOnPdf(FPDF $pdf, string $text, int $x, int $y) {
     $pdf->SetXY($x, $y);
     $pdf->Write(0, iconv('utf-8', 'windows-1251', $text));
 }
 
+$line = "";
+$j = 0;
+
+function ceateBlock(FPDF $pdf, array $array, int $x, int $y, int $lines, $row) {
+    $stepBottom = 7;
+    $lengthOfTextLine = 140;
+
+    // $pdf->GetStringWidth("d");
+
+    $jFinish = count($array);
+
+    global $j;
+    $j = 0;
+
+    for ($i=0; $i <= $lines && $j <= $jFinish; $i++) {
+        global $line;
+        $line = "";
+
+        global $j;
+        for ($jj=$j; $jj <= $jFinish; $jj++) {
+            $newLine = $line;
+
+            if (
+                ($array[$jj] == "обл. " && $jj == 2) ||
+                ($array[$jj] == "р-н " && $jj == 3) ||
+                ($array[$jj] == $row['r_a_st'] && $jj == 6) ||
+                ($array[$jj] == "к. " && $jj == 8) ||
+                ($array[$jj] == "кв. " && $jj == 9)
+            ) {
+                $j++;
+                continue;
+            }
+
+            $newLine = $newLine . " " . $array[$jj];
+
+            if ($jj == 0) {
+                global $j;
+                $j++;
+                global $line;
+                $line = $newLine;
+                break;
+            }
+
+            if ($pdf->GetStringWidth($newLine) > $lengthOfTextLine) {
+                break;
+            } else {
+                global $j;
+                $j++;
+                global $line;
+                $line = $newLine;
+                continue;
+            }
+        }
+
+        global $line;
+        writeOnPdf($pdf, $line, $x, $y + ($stepBottom * $i));
+    }
+}
+
 
 if ($result = mysqli_query($con, $sql)) {
-    $i = 0;
-    while ($row = mysqli_fetch_assoc($result)) {
-//        $letter['hash'] = $row['hash'];
-//        $letter['status'] = $row['status'];
 
-//        $letter['isMejdunarond'] = $row['isMejdunarond'];
-
-        //нижний правый угол
-        $letter['receiverAddress']['komu']['name'] = $row['r_ko_n'];
-        $letter['receiverAddress']['komu']['surname'] = $row['r_ko_s'];
-        $letter['receiverAddress']['komu']['otchestvo'] = $row['r_ko_o'];
-
-
-        $letter['receiverAddress']['kuda']['streetType'] = $row['r_ku_st'];
-        //нужно сделать обработку вида улицы или изменить данные в БД
-        $letter['receiverAddress']['kuda']['streetName'] = $row['r_ku_sn'];
-        $letter['receiverAddress']['kuda']['numberOfHouse'] = $row['r_ku_noh'];
-        $letter['receiverAddress']['kuda']['numberOfKorpus'] = $row['r_ku_nok'];
-        $letter['receiverAddress']['kuda']['numberOfFlat'] = $row['r_ku_nof'];
-
-        $letter['receiverAddress']['index'] = $row['r_index'];
-
-        $letter['receiverAddress']['nasPunktName']['oblast'] = $row['r_npn_o'];
-        $letter['receiverAddress']['nasPunktName']['region'] = $row['r_npn_r'];
-        $letter['receiverAddress']['nasPunktName']['townName'] = $row['r_npn_tn'];
-        $letter['receiverAddress']['nasPunktName']['typeOfTown'] = $row['r_npn_tot'];
-
-
-        //вержний левый угол
-        $letter['otpravitelAddress']['otKogo']['name'] = $row['o_ok_n'];
-        $letter['otpravitelAddress']['otKogo']['surname'] = $row['o_ok_s'];
-        $letter['otpravitelAddress']['otKogo']['otchestvo'] = $row['o_ok_o'];
-
-        $letter['otpravitelAddress']['adress']['oblast'] = $row['o_a_o'];
-        $letter['otpravitelAddress']['adress']['region'] = $row['o_a_r'];
-        $letter['otpravitelAddress']['adress']['townName'] = $row['o_a_tn'];
-        $letter['otpravitelAddress']['adress']['typeOfTown'] = $row['o_a_tot'];
-
-        $letter['otpravitelAddress']['adress']['streetType'] = $row['o_a_st'];
-        $letter['otpravitelAddress']['adress']['streetName'] = $row['o_a_sn'];
-        $letter['otpravitelAddress']['adress']['numberOfHouse'] = $row['o_a_noh'];
-        $letter['otpravitelAddress']['adress']['numberOfKorpus'] = $row['o_a_nok'];
-        $letter['otpravitelAddress']['adress']['numberOfFlat'] = $row['o_a_nof'];
-//
-//        $letter['dateAndTimeOfStartWay'] = $row['dateAndTimeOfStartWay'];
-
-        $i++;
-    }
 
     // начало PDF
 
@@ -94,45 +105,138 @@ if ($result = mysqli_query($con, $sql)) {
 // устанавливаем цвет шрифта
 //$pdf->SetTextColor(250,60,100);
 // устанавливаем размер шрифта
-    $pdf->SetFontSize(12);
+    $pdf->SetFontSize(17);
 
 // добавляем текст
 
+$i = 0;
+    while ($row = mysqli_fetch_assoc($result)) {
+//        $letter['hash'] = $row['hash'];
+//        $letter['status'] = $row['status'];
+
+//        $letter['isMejdunarond'] = $row['isMejdunarond'];
+
+
+        $arrayForInsertingDataRightBotton = array(
+            $row['r_ko_s'],
+            $row['r_ko_n'] . " " . $row['r_ko_o'],
+
+            "обл. " . $row['r_a_o'], // please check if this exist
+            "р-н " . $row['r_a_r'], // please check if this exist
+
+            $row['r_a_index'],
+
+            $row['r_a_tot'] . " " . $row['r_a_tn'],
+
+            $row['r_a_st'] . " " . $row['r_a_sn'], // please check if this exist
+
+            "д. " . $row['r_a_noh'],
+            "к. " . $row['r_a_nok'], // please check if this exist
+            "кв. " . $row['r_a_nof'], // please check if this exist
+
+            // $row['r_a_c'] // check if this exist, oby for mejdunarodn
+        );
+
+        ceateBlock($pdf, $arrayForInsertingDataRightBotton, 140, 77, 8, $row);
+        //нижний правый угол
+        // $letter['receiverAddress']['komu']['name'] = $row['r_ko_n'];
+        // $letter['receiverAddress']['komu']['surname'] = $row['r_ko_s'];
+        // $letter['receiverAddress']['komu']['otchestvo'] = $row['r_ko_o'];
+
+        // $letter['receiverAddress']['adress']['streetType'] = $row['r_a_st'];
+        // $letter['receiverAddress']['adress']['streetName'] = $row['r_a_sn'];
+        // $letter['receiverAddress']['adress']['numberOfHouse'] = $row['r_a_noh'];
+        // $letter['receiverAddress']['adress']['numberOfKorpus'] = $row['r_a_nok'];
+        // $letter['receiverAddress']['adress']['numberOfFlat'] = $row['r_a_nof'];
+
+        // $letter['receiverAddress']['adress']['index'] = $row['r_a_index'];
+        // // $letter['receiverAddress']['adress']['index'] = $row['r_index'];
+
+        // $letter['receiverAddress']['adress']['oblast'] = $row['r_a_o'];
+        // $letter['receiverAddress']['adress']['region'] = $row['r_a_r'];
+        // $letter['receiverAddress']['adress']['townName'] = $row['r_a_tn'];
+        // $letter['receiverAddress']['adress']['typeOfTown'] = $row['r_a_tot'];
+        // $letter['receiverAddress']['adress']['country'] = $row['r_a_c'];
+
+
+        $arrayForInsertingDataLeftTop = array(
+            $row['o_ok_s'],
+            $row['o_ok_n'] . " " . $row['o_ok_o'],
+
+            "обл. " . $row['o_a_o'], // please check if this exist
+            "р-н " . $row['o_a_r'], // please check if this exist
+
+            $row['o_a_index'], // may not need ?
+
+            $row['o_a_tot'] . " " . $row['o_a_tn'],
+
+            $row['o_a_st'] . " " . $row['o_a_sn'], // please check if this exist
+
+            "д. " . $row['o_a_noh'],
+            "к. " . $row['o_a_nok'], // please check if this exist
+            "кв. " . $row['o_a_nof'], // please check if this exist
+
+            // $row['r_a_c'] // check if this exist, oby for mejdunarodn
+        );
+
+        ceateBlock($pdf, $arrayForInsertingDataLeftTop, 20, 22, 8, $row);
+
+        //вержний левый угол
+        // $letter['otpravitelAddress']['otKogo']['name'] = $row['o_ok_n'];
+        // $letter['otpravitelAddress']['otKogo']['surname'] = $row['o_ok_s'];
+        // $letter['otpravitelAddress']['otKogo']['otchestvo'] = $row['o_ok_o'];
+
+        // $letter['otpravitelAddress']['adress']['oblast'] = $row['o_a_o'];
+        // $letter['otpravitelAddress']['adress']['region'] = $row['o_a_r'];
+        // $letter['otpravitelAddress']['adress']['townName'] = $row['o_a_tn'];
+        // $letter['otpravitelAddress']['adress']['typeOfTown'] = $row['o_a_tot'];
+
+        // $letter['otpravitelAddress']['adress']['streetType'] = $row['o_a_st'];
+        // $letter['otpravitelAddress']['adress']['streetName'] = $row['o_a_sn'];
+        // $letter['otpravitelAddress']['adress']['numberOfHouse'] = $row['o_a_noh'];
+        // $letter['otpravitelAddress']['adress']['numberOfKorpus'] = $row['o_a_nok'];
+        // $letter['otpravitelAddress']['adress']['numberOfFlat'] = $row['o_a_nof'];
+//
+//        $letter['dateAndTimeOfStartWay'] = $row['dateAndTimeOfStartWay'];
+
+        $i++;
+    }
+
     //1
-    writeOnPdf($pdf, $letter['receiverAddress']['komu']['surname'], 140, 77);
+    // writeOnPdf($pdf, $letter['receiverAddress']['komu']['surname'], 140, 77);
 
-    //2
-    writeOnPdf($pdf, $letter['receiverAddress']['komu']['name'], 140, 84);
+    // //2
+    // writeOnPdf($pdf, $letter['receiverAddress']['komu']['name'], 140, 84);
 
-    writeOnPdf($pdf, $letter['receiverAddress']['komu']['otchestvo'], 175, 84);
+    // writeOnPdf($pdf, $letter['receiverAddress']['komu']['otchestvo'], 175, 84);
 
-    //3
-    writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['oblast'], 140, 91);
+    // //3
+    // writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['oblast'], 140, 91);
 
-    writeOnPdf($pdf, "обл.", 205, 91);
+    // writeOnPdf($pdf, "обл.", 205, 91);
 
-    //4
-    writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['region'], 140, 98);
+    // //4
+    // writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['region'], 140, 98);
 
-    writeOnPdf($pdf, "р-н", 205, 98);
+    // writeOnPdf($pdf, "р-н", 205, 98);
 
-    //5 индекс
-    writeOnPdf($pdf, $letter['receiverAddress']['index'], 140, 105);
+    // //5 индекс
+    // writeOnPdf($pdf, $letter['receiverAddress']['index'], 140, 105);
 
-    writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['typeOfTown'], 171, 105);
+    // writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['typeOfTown'], 171, 105);
 
-    writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['townName'], 180, 105);
+    // writeOnPdf($pdf, $letter['receiverAddress']['nasPunktName']['townName'], 180, 105);
 
-    //6
-    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['streetType'], 140, 112);
+    // //6
+    // writeOnPdf($pdf, $letter['receiverAddress']['kuda']['streetType'], 140, 112);
 
-    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['streetName'], 150, 112);
+    // writeOnPdf($pdf, $letter['receiverAddress']['kuda']['streetName'], 150, 112);
 
-    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfHouse'], 185, 112);
+    // writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfHouse'], 185, 112);
 
-    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfKorpus'], 295, 112);
+    // writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfKorpus'], 295, 112);
 
-    writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfFlat'], 205, 112);
+    // writeOnPdf($pdf, $letter['receiverAddress']['kuda']['numberOfFlat'], 205, 112);
 
 
 //    $pdf->Ln(4);                    //Break
@@ -144,20 +248,20 @@ if ($result = mysqli_query($con, $sql)) {
     $pdf->Line(10, 120, 10, 10);  //Set the line
 
     //верхий левый угол - линии
-    $pdf->Line(20, 22 + 2, 90, 22 + 2);
-    $pdf->Line(20, 29 + 2, 90, 29 + 2);
-    $pdf->Line(20, 36 + 2, 90, 36 + 2);
-    $pdf->Line(20, 43 + 2, 90, 43 + 2);
-    $pdf->Line(20, 50 + 2, 90, 50 + 2);
+    $pdf->Line(20, 22 + 3, 90, 22 + 3);
+    $pdf->Line(20, 29 + 3, 90, 29 + 3);
+    $pdf->Line(20, 36 + 3, 90, 36 + 3);
+    $pdf->Line(20, 43 + 3, 90, 43 + 3);
+    $pdf->Line(20, 50 + 3, 90, 50 + 3);
 
     //правый нижний угол - линии
 
-    $pdf->Line(140, 77 + 2, 220, 77 + 2);
-    $pdf->Line(140, 84 + 2, 220, 84 + 2);
-    $pdf->Line(140, 91 + 2, 220, 91 + 2);
-    $pdf->Line(140, 98 + 2, 220, 98 + 2);
-    $pdf->Line(140, 105 + 2, 220, 105 + 2);
-    $pdf->Line(140, 112 + 2, 220, 112 + 2);
+    $pdf->Line(140, 77 + 3, 220, 77 + 3);
+    $pdf->Line(140, 84 + 3, 220, 84 + 3);
+    $pdf->Line(140, 91 + 3, 220, 91 + 3);
+    $pdf->Line(140, 98 + 3, 220, 98 + 3);
+    $pdf->Line(140, 105 + 3, 220, 105 + 3);
+    $pdf->Line(140, 112 + 3, 220, 112 + 3);
 
 
 
@@ -165,35 +269,35 @@ if ($result = mysqli_query($con, $sql)) {
     //вержний левый угол
 
     //1
-    writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['surname'], 20, 22);
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['surname'], 20, 22);
 
-    //2
-    writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['name'], 20, 29);
+    // //2
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['name'], 20, 29);
 
-    writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['otchestvo'], 55, 29);
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['otKogo']['otchestvo'], 55, 29);
 
-    //3
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['oblast'], 20, 36);
+    // //3
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['oblast'], 20, 36);
 
-    writeOnPdf($pdf, "обл.", 80, 36);
+    // writeOnPdf($pdf, "обл.", 80, 36);
 
-    //4
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['region'], 20, 43);
+    // //4
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['region'], 20, 43);
 
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['typeOfTown'], 45, 43);
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['typeOfTown'], 45, 43);
 
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['townName'], 55, 43);
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['townName'], 55, 43);
 
-    //5
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['streetType'], 20, 50);
+    // //5
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['streetType'], 20, 50);
 
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['streetName'], 30, 50);
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['streetName'], 30, 50);
 
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfHouse'], 65, 50);
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfHouse'], 65, 50);
 
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfKorpus'], 75, 50);
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfKorpus'], 75, 50);
 
-    writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfFlat'], 85, 50);
+    // writeOnPdf($pdf, $letter['otpravitelAddress']['adress']['numberOfFlat'], 85, 50);
 
 //индекс отправителя забыли в бд
 
