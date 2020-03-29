@@ -1,11 +1,15 @@
 <?php
 require 'database.php';
 require_once("../fpdf/fpdf.php");
+// require_once("");
 
+require '../vendor/autoload.php';
 
 $letter = [];
 
 $id = ($_GET['id'] !== null && (int)$_GET['id'] > -1) ? mysqli_real_escape_string($con, (int)$_GET['id']) : false;
+global $hash;
+$hash = $_GET['hash'] !== null ? $_GET['hash'] : '';
 
 if ($id === false) {
     return http_response_code(400);
@@ -302,8 +306,19 @@ $i = 0;
 
 //индекс отправителя забыли в бд
 
-    $value = "1";
-    $pdf->Image('http://chart.apis.google.com/chart?cht=qr&chs=350x350&chl=' . $value . '.png', 47, 65, 45);
+    $value = $id;
+    $pdf->Image('http://chart.apis.google.com/chart?cht=qr&chs=350x350&chl=' . $value . '.png', 20, 65, 45);
+
+    $generator = new Picqer\Barcode\BarcodeGeneratorPNG();
+    $file = $generator->getBarcode($hash, $generator::TYPE_CODE_128);
+    $baseFile = "data:image/png;base64," . base64_encode($file);
+
+    $img = str_replace('data:image/png;base64,', '', $baseFile);
+    $img = str_replace(' ', '+', $img);
+    $data = base64_decode($img);
+    file_put_contents('/tmp/image.png', $data);
+
+    $pdf->Image('/tmp/image.png', 75, 70, 50);
 
 
     // конец PDF

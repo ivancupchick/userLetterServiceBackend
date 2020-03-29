@@ -117,13 +117,53 @@ if (isset($postdata) && !empty($postdata)) {
     */
 
     if (mysqli_query($con, $sql)) {
-        http_response_code(201);
+        // http_response_code(201);
 
         $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         $id = mysqli_insert_id($con);
 
-        $letter = $actual_link . "/../downloadPDF.php?id=" . $id;
-        echo json_encode($letter);
+        // $hash; 8, 6, 4, 2, 3, 5, 9, 7;
+
+        $newHash = str_pad($id, 8, "0", STR_PAD_LEFT);
+
+        $first = (int)$newHash[0] * 8;
+        $second = (int)$newHash[1] * 6;
+        $third = (int)$newHash[2] * 4;
+        $fourth = (int)$newHash[3] * 2;
+        $fifth = (int)$newHash[4] * 3;
+        $sixth = (int)$newHash[5] * 5;
+        $seventh = (int)$newHash[6] * 9;
+        $eighth = (int)$newHash[7] * 7;
+        $sum = $first + $second + $third + $fourth + $fifth + $sixth + $seventh + $eighth;
+
+        $promSum = 11 - ($sum % 11);
+
+        $contrl = 0;
+
+        if ($promSum >= 1 && $promSum <= 9) {
+          $contrl = $promSum;
+        } else if ($promSum == 10) {
+          $contrl = 0;
+        } else if ($promSum == 11) {
+          $contrl = 5;
+        }
+
+        $newNewHash = $hash . $newHash . $contrl . "BY";
+
+        $sql = "UPDATE `letters` SET `hash`='$newNewHash' WHERE `id` = '{$id}' LIMIT 1";
+
+        if (mysqli_query($con, $sql)) {
+          http_response_code(201);
+
+          $letter["url"] = $actual_link . "/../downloadPDF.php?id=" . $id . "&hash=" . $newNewHash;
+          $letter["hash"] = $newNewHash;
+          echo json_encode($letter);
+        } else {
+          return http_response_code(422);
+        }
+
+
+
     } else {
         http_response_code(422);
     }
