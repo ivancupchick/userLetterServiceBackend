@@ -66,12 +66,13 @@ if (isset($postdata) && !empty($postdata)) {
     $lwav = mysqli_real_escape_string($con, trim($request->letterWithAnnouncedValue));
     $lwp = mysqli_real_escape_string($con, trim($request->letterWithPrice));
     $dateAndTimeOfStartWay = mysqli_real_escape_string($con, (int)$request->dateAndTimeOfStartWay);
+    $history = mysqli_real_escape_string($con, (int)$request->history);
 
     // Create.
     $sql = "INSERT INTO `letters`(`id`,
-    `hash`,`status`,`isMejdunarond`,`r_ko_n`,`r_ko_s`,`r_ko_o`,`r_a_st`,`r_a_sn`,`r_a_noh`,`r_a_nok`,`r_a_nof`,`r_a_o`,`r_a_r`,`r_a_tn`,`r_a_tot`,`r_a_c`,`r_a_index`,`o_ok_n`,`o_ok_s`,`o_ok_o`,`o_a_o`,`o_a_r`,`o_a_tn`,`o_a_tot`,`o_a_c`,`o_a_index`,`o_a_st`,`o_a_sn`,`o_a_noh`,`o_a_nok`,`o_a_nof`,`lt`,`sm`,`lwav`,`lwp`,`dateAndTimeOfStartWay`
+    `hash`,`status`,`isMejdunarond`,`r_ko_n`,`r_ko_s`,`r_ko_o`,`r_a_st`,`r_a_sn`,`r_a_noh`,`r_a_nok`,`r_a_nof`,`r_a_o`,`r_a_r`,`r_a_tn`,`r_a_tot`,`r_a_c`,`r_a_index`,`o_ok_n`,`o_ok_s`,`o_ok_o`,`o_a_o`,`o_a_r`,`o_a_tn`,`o_a_tot`,`o_a_c`,`o_a_index`,`o_a_st`,`o_a_sn`,`o_a_noh`,`o_a_nok`,`o_a_nof`,`lt`,`sm`,`lwav`,`lwp`,`dateAndTimeOfStartWay`,`history`
     ) VALUES (null,
-    '{$hash}','{$status}','{$isMejdunarond}','{$r_ko_n}','{$r_ko_s}','{$r_ko_o}','{$r_a_st}','{$r_a_sn}','{$r_a_noh}','{$r_a_nok}','{$r_a_nof}','{$r_a_o}','{$r_a_r}','{$r_a_tn}','{$r_a_tot}','{$r_a_c}','{$r_a_index}','{$o_ok_n}','{$o_ok_s}','{$o_ok_o}','{$o_a_o}','{$o_a_r}','{$o_a_tn}','{$o_a_tot}','{$o_a_c}','{$o_a_index}','{$o_a_st}','{$o_a_sn}','{$o_a_noh}','{$o_a_nok}','{$o_a_nof}','{$lt}','{$sm}','{$lwav}','{$lwp}','{$dateAndTimeOfStartWay}'
+    '{$hash}','{$status}','{$isMejdunarond}','{$r_ko_n}','{$r_ko_s}','{$r_ko_o}','{$r_a_st}','{$r_a_sn}','{$r_a_noh}','{$r_a_nok}','{$r_a_nof}','{$r_a_o}','{$r_a_r}','{$r_a_tn}','{$r_a_tot}','{$r_a_c}','{$r_a_index}','{$o_ok_n}','{$o_ok_s}','{$o_ok_o}','{$o_a_o}','{$o_a_r}','{$o_a_tn}','{$o_a_tot}','{$o_a_c}','{$o_a_index}','{$o_a_st}','{$o_a_sn}','{$o_a_noh}','{$o_a_nok}','{$o_a_nof}','{$lt}','{$sm}','{$lwav}','{$lwp}','{$dateAndTimeOfStartWay}','{$history}'
     )";
 
     /*

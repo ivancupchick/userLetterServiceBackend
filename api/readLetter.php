@@ -50,6 +50,28 @@ if($result = mysqli_query($con,$sql))
     $letters[$i]['otpravitelAddress']['adress']['numberOfFlat'] = $row['o_a_nof'];
 
     $letters[$i]['dateAndTimeOfStartWay'] = $row['dateAndTimeOfStartWay'];
+    // $letter['hash'] = $row['hash'];
+    // $letter['status'] = $row['status'];
+
+    // $letter['isMejdunarond'] = $row['isMejdunarond'];
+    // $letter['receiverAddress']['komu']['name'] = $row['r_ko_n'];
+    // $letter['receiverAddress']['komu']['surname'] = $row['r_ko_s'];
+    // $letter['receiverAddress']['komu']['otchestvo'] = $row['r_ko_o'];
+
+    // $letter['receiverAddress']['adress']['streetType'] = $row['r_a_st'];
+    // $letter['receiverAddress']['adress']['streetName'] = $row['r_a_sn'];
+    // $letter['receiverAddress']['adress']['numberOfHouse'] = $row['r_a_noh'];
+    // $letter['receiverAddress']['adress']['numberOfKorpus'] = $row['r_a_nok'];
+    // $letter['receiverAddress']['adress']['numberOfFlat'] = $row['r_a_nof'];
+
+    // $letter['receiverAddress']['adress']['index'] = $row['r_a_index'];
+    // // $letter['receiverAddress']['adress']['index'] = $row['r_index'];
+
+    // $letter['receiverAddress']['adress']['oblast'] = $row['r_a_o'];
+    // $letter['receiverAddress']['adress']['region'] = $row['r_a_r'];
+    // $letter['receiverAddress']['adress']['townName'] = $row['r_a_tn'];
+    // $letter['receiverAddress']['adress']['typeOfTown'] = $row['r_a_tot'];
+    // $letter['receiverAddress']['adress']['country'] = $row['r_a_c'];
 
     $i++;
   }

@@ -19,10 +19,11 @@ if(isset($postdata) && !empty($postdata))
   // Sanitize.
   $id    = mysqli_real_escape_string($con, (int)$request->id);
   $status = mysqli_real_escape_string($con, trim($request->status));
-  $letterHistory = json_encode(trim($request->letterHistory));
+  $letterHistory = $request->letterHistory;
+  // echo $letterHistory;
 
   // Update.
-  $sql = "UPDATE `letters` SET `status`='$status', `history`=CONCAT(`history`, '|{$letterHistory}') WHERE `id` = '{$id}' LIMIT 1";
+  $sql = "UPDATE `letters` SET `status`='$status', `history`=CONCAT(`history`, '|$letterHistory') WHERE `id` = '{$id}' LIMIT 1";
 
   if(mysqli_query($con, $sql)) {
     http_response_code(204);
